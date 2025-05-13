@@ -1,0 +1,82 @@
+<odoo>
+    <record id="view_property_list" model="ir.ui.view">
+        <field name="name">property.list</field>
+        <field name="model">property</field>
+        <field name="arch" type="xml">
+            <list string="Investments" default_order="partner_id">
+                <header>
+                    <button name="property_xlsx_report" type="object" string="Print Wallet"
+                            class="btn-primary">
+                    </button>
+                </header>
+                <field name="partner_id" required="1"/>
+                <field name="project_id"/>
+                <field name="invested_amount" sum="Total"
+                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="invest_ratio" string="Inv. (%)"/>
+                <field name="investor_profit" string="Profit"
+                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="roi_ratio" string="ROI (%)"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_property_form" model="ir.ui.view">
+        <field name="name">property.form</field>
+        <field name="model">property</field>
+        <field name="arch" type="xml">
+            <form string="Investment Details">
+                <sheet>
+                    <group>
+                        <group class="oe_highlight" col="2">
+                            <field name="partner_id"
+                                   required="1"
+                                   string="Investor Name"/>
+                            <field name="project_id"
+                                   required="1"
+                                   string="Project"/>
+                        </group>
+                    </group>
+
+                    <group string="Investment Details" colspan="2">
+                        <field name="invested_amount" required="1"
+                               widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <!--                        <field name="investor_profit"-->
+                        <!--                               widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+                        <!--                        <field name="roi_ratio"/>-->
+                        <field name="x_project_cost" widget="monetary" string="Project Estimate"
+                               options="{'currency_field': 'currency_id'}"/>
+                        <field name="project_fill_percent" widget="progressbar"/>
+                        <field name="remaining_investable_amount" widget="monetary"
+                               options="{'currency_field': 'currency_id'}"/>
+                        <field name="total_project_cost" string="Project Total Cost" readonly="1"/>
+                    </group>
+                    <notebook colspan="2">
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Project Terms">
+                            <field name="term_line_ids">
+                                <list editable="bottom">
+                                    <field name="term_type"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_property_term_line_tree" model="ir.ui.view">
+        <field name="name">property.term.line.tree</field>
+        <field name="model">property.term.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="term_type"/>
+                <field name="amount"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>
