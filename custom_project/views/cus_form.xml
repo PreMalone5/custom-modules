@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Inherit the Project Form View -->
+        <record id="view_project_form_inherit" model="ir.ui.view">
+            <field name="name">project.project.form.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <!-- Add fields after the label_task field -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Project Details">
+                        <group>
+                            <field name="project_type"/>
+                            <field name="project_cost"/>
+                            <field name="analytic_account_id"/>
+                            <field name="total_project_cost" string="Project Total Cost" readonly="1"/>
+                        </group>
+                    </page>
+                </xpath>
+                <xpath expr="//button[@name='project_update_all_action']" position="after">
+
+                    <button
+                            name="action_open_investors"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-users"
+                    >
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Investors</span>
+                        </div>
+                    </button>
+                    <button name="projects_xlsx_report"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-print"
+                    >
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Print Report</span>
+                        </div>
+                    </button>
+                </xpath>
+                <xpath expr="//page[@name='analytic']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Project Terms">
+                        <field name="term_line_ids">
+                            <list editable="bottom">
+                                <field name="term_type"/>
+                                <field name="amount"/>
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

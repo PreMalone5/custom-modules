@@ -1,0 +1,18 @@
+<odoo>
+  <!-- Ensure model is defined -->
+  <record id="model_property" model="ir.model">
+    <field name="name">Property</field>
+    <field name="model">property</field>
+  </record>
+
+  <!-- Cron job -->
+  <record id="cron_sync_wallet_profits" model="ir.cron">
+    <field name="name">Auto Sync Wallet Profits</field>
+    <field name="model_id" ref="masar_investment.model_property"/>
+    <field name="state">code</field>
+    <field name="code">model.cron_sync_all_wallet_profits()</field>
+    <field name="interval_number">1</field>
+    <field name="interval_type">hours</field>
+    <field name="active">True</field>
+  </record>
+</odoo>

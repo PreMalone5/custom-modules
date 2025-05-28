@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Inherit Project List View -->
+        <record id="view_project_list_inherit" model="ir.ui.view">
+            <field name="name">project.project.list.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//list" position="inside">
+                    <!-- Add Project Type and Project Cost columns -->
+                    <field name="project_type"/>
+                    <field name="project_cost"/>
+                    <field name="profit"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

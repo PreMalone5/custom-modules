@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_property,access_property,model_property,,1,1,1,1
+access_investor_wallet_transaction_user,access.investor.wallet.transaction.user,model_investor_wallet_transaction,base.group_user,1,1,1,1
+access_investor_wallet_user,access.investor.wallet.user,model_investor_wallet,base.group_user,1,1,1,1

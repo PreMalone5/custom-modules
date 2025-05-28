@@ -1,0 +1,11 @@
+<odoo>
+
+    <report
+    id="report_cust"
+    string="Contribution Report"
+    model="contacts"
+    report_type="xlsx"
+    name="contacts.report_cust"
+    file="contacts.report_cust"/>
+
+</odoo>

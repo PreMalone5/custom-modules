@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Project Form View -->
+        <record id="view_project_quick_create_inherit" model="ir.ui.view">
+            <field name="name">project.project</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+            <field name="arch" type="xml">
+                <!-- Add fields to the form -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <group>
+                        <field name="project_type"
+                               string="Project Type"
+                               style="font-size: 14px;"/>
+                        <field name="project_cost"
+                               string="Project Estimate"
+                               style="font-size: 14px;"/>
+                        <field name="analytic_account_id"
+                               string="Analytical Account"
+                               style="font-size: 14px;"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
