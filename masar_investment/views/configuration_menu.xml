@@ -1,0 +1,27 @@
+<odoo>
+    <!-- Configuration Section Header -->
+    <menuitem
+        id="investor_config_menu"
+        name="Configuration"
+        parent="investors_root_menu"
+        sequence="99"
+        groups="base.group_system"
+    />
+
+    <!-- Example configuration model: res.config.settings -->
+    <record id="action_investor_settings" model="ir.actions.act_window">
+        <field name="name">Investor Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+
+    <menuitem
+        id="menu_investor_settings"
+        name="Settings"
+        parent="investor_config_menu"
+        action="action_investor_settings"
+        sequence="1"
+        groups="base.group_system"
+    />
+</odoo>

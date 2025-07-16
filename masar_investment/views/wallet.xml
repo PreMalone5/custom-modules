@@ -34,14 +34,17 @@
                     <group string="Transactions">
                         <field name="transaction_ids">
                             <list editable="top">
-                                <field name="create_date"/>
+                                <field name="transaction_date"/>
                                 <field name="type"/>
                                 <field name="amount"/>
+                                <field name="project_id" string="Linked Project"
+                                       invisible="type not in ('charity', 'company_share')"/>
                                 <field name="note"/>
                             </list>
                         </field>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

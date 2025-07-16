@@ -4,20 +4,25 @@ from odoo.exceptions import ValidationError
 class InvestorWallet(models.Model):
     _name = 'investor.wallet'
     _description = 'Investor Wallet'
+    _inherit = ['mail.thread','mail.activity.mixin']
+
 
     partner_id = fields.Many2one(
         'res.partner', string='Investor', required=True,
-        domain="[('is_investor','=',True)]"
+        domain="[('is_investor','=',True)]",
+        tracking=1
     )
     currency_id = fields.Many2one(
         'res.currency', string='Currency', required=True,
         default=lambda self: self.env.user.company_id.currency_id.id,
-        help='Currency for the wallet'
+        help='Currency for the wallet',
+        tracking=1
     )
     balance = fields.Monetary(
         string='Balance', currency_field='currency_id',
         compute='_compute_balance', store=True,
-        help='Computed from transactions'
+        help='Computed from transactions',
+        tracking=1
     )
     transaction_ids = fields.One2many(
         'investor.wallet.transaction', 'wallet_id',

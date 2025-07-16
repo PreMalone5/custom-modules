@@ -12,6 +12,7 @@
         'views/base_menu.xml',
         'views/property_view.xml',
         'views/wallet.xml',
+        'views/configuration_menu.xml',
         # 'reports/wallet_report.xml',
         # 'static/description/icon.png'
     ],

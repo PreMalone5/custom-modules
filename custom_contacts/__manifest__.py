@@ -1,4 +1,7 @@
 {
+    'author': 'Irtiqadx',
+    'summary': '',
+    'author': 'Irtiqadx',
     'name': 'Custom Contact Fields',
     'version': '1.0',
     'depends': ['contacts'],

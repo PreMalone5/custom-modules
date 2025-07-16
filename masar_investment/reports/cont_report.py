@@ -198,6 +198,89 @@ class XlsxContReport(http.Controller):
                                 f"=SUM(B{investor_total_row + 1}:{xlsx_col(len(investors))}{investor_total_row + 1})",
                                 total_fmt)
 
+        # ===============================
+        # Table 4: Deposit + External Profit Table
+        # ===============================
+        deposit_row_start = investor_total_row + 3
+        worksheet.merge_range(deposit_row_start, 0, deposit_row_start, 4, "إضافة راس المال نقدية + أرباح استثمارات خارجية", title_fmt)
+
+        deposit_header_row = deposit_row_start + 1
+        worksheet.write(deposit_header_row, 0, "اسم المستثمر", header_fmt)
+        worksheet.write(deposit_header_row, 1, "تاريخ العملية", header_fmt)
+        worksheet.write(deposit_header_row, 2, "نوع", header_fmt)
+        worksheet.write(deposit_header_row, 3, "المبلغ", header_fmt)
+        worksheet.write(deposit_header_row, 4, "ملاحظات", header_fmt)
+
+        transaction_model = request.env['investor.wallet.transaction']
+        row_idx = deposit_header_row + 1
+        for investor in investors:
+            wallet = request.env['investor.wallet'].search([('partner_id', '=', investor.id)], limit=1)
+            if not wallet:
+                continue
+            transactions = transaction_model.search([
+                ('wallet_id', '=', wallet.id),
+                ('type', 'in', ['deposit', 'withdrawal'])
+            ])
+            for tx in transactions:
+                worksheet.write(row_idx, 0, investor.name, money_fmt)
+                worksheet.write(row_idx, 1, tx.transaction_date.strftime('%Y-%m-%d'), money_fmt)
+                worksheet.write(row_idx, 2, dict(tx._fields['type'].selection).get(tx.type, ''), money_fmt)
+                worksheet.write(row_idx, 3, tx.amount, money_fmt)
+                worksheet.write(row_idx, 4, tx.note or '', money_fmt)
+                row_idx += 1
+
+        # ===============================
+        # Table 5: زكاة المساهمين المدفوعه عن طريق الشركه
+        # ===============================
+        zakah_row_start = row_idx + 3
+        worksheet.merge_range(zakah_row_start, 0, zakah_row_start, len(investors) + 1,
+                              "زكاة المساهمين المدفوعه عن طريق الشركه", title_fmt)
+
+        # Header row
+        zakah_header_row = zakah_row_start + 1
+        worksheet.write(zakah_header_row, 0, "مصروفات زكاة", header_fmt)
+        for col, investor in enumerate(investors, start=1):
+            worksheet.write(zakah_header_row, col, investor.name, header_fmt)
+        worksheet.write(zakah_header_row, len(investors) + 1, "إجمالي", header_fmt)
+
+        # Data rows grouped by project_id
+        zakah_tx_model = request.env['investor.wallet.transaction']
+        zakah_tx_lines = zakah_tx_model.search([
+            ('type', '=', 'charity'),
+            ('project_id', '!=', False)
+        ])
+
+        # Build zakah map: { project_name: { investor_id: amount } }
+        zakah_map = {}
+        for tx in zakah_tx_lines:
+            project = tx.project_id.name
+            investor_id = tx.wallet_id.partner_id.id
+            zakah_map.setdefault(project, {}).setdefault(investor_id, 0.0)
+            zakah_map[project][investor_id] += abs(tx.amount)
+
+        # Write zakah rows
+        zakah_row = zakah_header_row + 1
+        for project_name, investor_amounts in zakah_map.items():
+            worksheet.write(zakah_row, 0, project_name, money_fmt)
+            for col, investor in enumerate(investors, start=1):
+                value = investor_amounts.get(investor.id, 0.0)
+                worksheet.write(zakah_row, col, value, money_fmt)
+            # Row total
+            row_total_formula = f"=SUM(B{zakah_row + 1}:{xlsx_col(len(investors))}{zakah_row + 1})"
+            worksheet.write_formula(zakah_row, len(investors) + 1, row_total_formula, money_fmt)
+            zakah_row += 1
+
+        # Totals row
+        worksheet.write(zakah_row, 0, "إجمالي المصروفات", total_fmt)
+        for col in range(1, len(investors) + 1):
+            col_letter = xlsx_col(col)
+            formula = f"=SUM({col_letter}{zakah_header_row + 2}:{col_letter}{zakah_row})"
+            worksheet.write_formula(zakah_row, col, formula, total_fmt)
+
+        worksheet.write_formula(zakah_row, len(investors) + 1,
+                                f"=SUM({xlsx_col(1)}{zakah_row + 1}:{xlsx_col(len(investors))}{zakah_row + 1})",
+                                total_fmt)
+
         # Final touches
         worksheet.freeze_panes(2, 1)
         worksheet.set_column('A:Z', 22)

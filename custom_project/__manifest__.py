@@ -1,5 +1,7 @@
 {
     'name': 'Custom Project Fields',
+    'summary': '',
+    'author': 'Irtiqadx',
     'version': '1.0',
     'depends': ['project','account'],
     'data': [

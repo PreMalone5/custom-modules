@@ -111,11 +111,11 @@ class Property(models.Model):
         }
 
     @api.model
-    def create(self, vals):
-        record = super().create(vals)
+    def create(self, vals_list):
+        records = super().create(vals_list)
         if not self.env.context.get('wallet_syncing'):
-            record.with_context(wallet_syncing=True)._sync_wallet_transactions()
-        return record
+            records.with_context(wallet_syncing=True)._sync_wallet_transactions()
+        return records
 
     def write(self, vals):
         res = super().write(vals)
@@ -135,7 +135,7 @@ class Property(models.Model):
             if not wallet:
                 continue
 
-            note_investment = f'Investment for Property {record.id}'
+            note_investment = f'Investment for {record.project_id.name}'
             if record.invested_amount and not Transaction.search([
                 ('wallet_id', '=', wallet.id), ('note', '=', note_investment)
             ]):
@@ -154,13 +154,21 @@ class Property(models.Model):
             old_profit = record.last_synced_profit or 0
             delta = new_profit - old_profit
 
-            if delta > 0:
-                Transaction.create({
-                    'wallet_id': wallet.id,
-                    'amount': delta,
-                    'type': 'profit',
-                    'note': f'Profit increment for Property {record.id}'
-                })
+            if delta != 0:
+                if delta > 0:
+                    Transaction.create({
+                        'wallet_id': wallet.id,
+                        'amount': delta,
+                        'type': 'profit',
+                        'note': f'Profit for Project {record.project_id.name}'
+                    })
+                else:
+                    Transaction.create({
+                        'wallet_id': wallet.id,
+                        'amount': delta,
+                        'type': 'expense',
+                        'note': f'Expense for Project {record.project_id.name}'
+                    })
                 record.last_synced_profit = new_profit
 
     @api.model

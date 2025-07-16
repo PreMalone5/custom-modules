@@ -6,9 +6,7 @@ class ProjectProject(models.Model):
     project_cost = fields.Monetary(string='Project Estimate', currency_field='currency_id')
     project_type = fields.Selection([
         ('development', 'Development'),
-        ('marketing', 'Marketing'),
-        ('research', 'Research'),
-        ('other', 'Other'),
+        ('external_investment', 'External investment'),
     ], string='Project Type')
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', readonly=True)
 
