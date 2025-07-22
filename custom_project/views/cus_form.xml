@@ -47,7 +47,7 @@
                     <page string="Project Terms">
                         <field name="term_line_ids">
                             <list editable="bottom">
-                                <field name="term_type"/>
+                                <field name="term_type_text"/>
                                 <field name="amount"/>
                             </list>
                         </field>

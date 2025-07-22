@@ -76,11 +76,11 @@ class InvestorWalletTransaction(models.Model):
             if rec.type in ('withdrawal', 'investment') and new_balance < 0:
                 raise ValidationError("This transaction would cause the wallet balance to go below zero.")
 
-    def unlink(self):
-        for rec in self:
-            if rec.type in ('investment', 'profit', 'expense'):
-                raise ValidationError("You cannot delete system-generated transactions like investment, profit, or expense.")
-        return super().unlink()
+    # def unlink(self):
+    #     for rec in self:
+    #         if rec.type in ('investment', 'profit', 'expense'):
+    #             raise ValidationError("You cannot delete system-generated transactions like investment, profit, or expense.")
+    #     return super().unlink()
 
     @api.model
     def fields_get(self, allfields=None, attributes=None):

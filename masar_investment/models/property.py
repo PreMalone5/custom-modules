@@ -135,18 +135,23 @@ class Property(models.Model):
             if not wallet:
                 continue
 
-            note_investment = f'Investment for {record.project_id.name}'
-            if record.invested_amount and not Transaction.search([
-                ('wallet_id', '=', wallet.id), ('note', '=', note_investment)
-            ]):
+            # --- 1. INVESTMENT TRANSACTION ---
+            existing_invest_tx = Transaction.search([
+                ('wallet_id', '=', wallet.id),
+                ('project_id', '=', record.project_id.id),
+                ('type', '=', 'investment')
+            ], limit=1)
+
+            if record.invested_amount and not existing_invest_tx:
                 Transaction.create({
                     'wallet_id': wallet.id,
                     'amount': -record.invested_amount,
                     'type': 'investment',
-                    'note': note_investment
+                    'project_id': record.project_id.id,
+                    'note': f'Investment for {record.project_id.name}'
                 })
 
-            # Calculate current profit
+            # --- 2. PROFIT/EXPENSE TRANSACTION (Delta Logic) ---
             project_cost = record.x_project_cost or 0
             project_profit = record.x_project_profit or 0
             invested = record.invested_amount or 0
@@ -155,21 +160,34 @@ class Property(models.Model):
             delta = new_profit - old_profit
 
             if delta != 0:
-                if delta > 0:
-                    Transaction.create({
-                        'wallet_id': wallet.id,
-                        'amount': delta,
-                        'type': 'profit',
-                        'note': f'Profit for Project {record.project_id.name}'
-                    })
-                else:
-                    Transaction.create({
-                        'wallet_id': wallet.id,
-                        'amount': delta,
-                        'type': 'expense',
-                        'note': f'Expense for Project {record.project_id.name}'
-                    })
+                tx_type = 'profit' if delta > 0 else 'expense'
+                Transaction.create({
+                    'wallet_id': wallet.id,
+                    'amount': delta,
+                    'type': tx_type,
+                    'project_id': record.project_id.id,
+                    'note': f'{"Profit" if delta > 0 else "Expense"} for {record.project_id.name}'
+                })
                 record.last_synced_profit = new_profit
+
+            # --- 3. UPDATE EXISTING NOTES TO MATCH CURRENT PROJECT NAME ---
+            transactions_to_update = Transaction.search([
+                ('wallet_id', '=', wallet.id),
+                ('project_id', '=', record.project_id.id),
+                ('type', 'in', ['investment', 'profit', 'expense'])
+            ])
+
+            for tx in transactions_to_update:
+                expected_note = ''
+                if tx.type == 'investment':
+                    expected_note = f'Investment for {record.project_id.name}'
+                elif tx.type == 'profit':
+                    expected_note = f'Profit for {record.project_id.name}'
+                elif tx.type == 'expense':
+                    expected_note = f'Expense for {record.project_id.name}'
+
+                if expected_note and tx.note != expected_note:
+                    tx.note = expected_note
 
     @api.model
     def cron_sync_all_wallet_profits(self):
